@@ -104,7 +104,7 @@ void CFib::PassTwo(FibTrie* pTrie, int default_NewPort)
 		pTrie->lchild->newPort=0;
 		pTrie->rchild->newPort=0;
 	}
-	//else if (0==pTrie->lchild->newPort && 0==pTrie->rchild->newPort)//空心空心选举
+	//else if (0==pTrie->lchild->newPort && 0==pTrie->rchild->newPort)
 	//{
 	//	//EmptyEmCount++;
 	//	//if (delegateProc(pTrie,default_NewPort)) pTrie->newPort=default_NewPort;
@@ -171,7 +171,7 @@ void CFib::PassTwo_forupdate(FibTrie* pTrie, int default_NewPort)
 		pTrie->lchild->newPort=0;
 		pTrie->rchild->newPort=0;
 	}
-	//else if (0==pTrie->lchild->newPort && 0==pTrie->rchild->newPort)//空心空心选举
+	//else if (0==pTrie->lchild->newPort && 0==pTrie->rchild->newPort)
 	//{
 	//	//EmptyEmCount++;
 	//	//if (delegateProc(pTrie,default_NewPort)) pTrie->newPort=default_NewPort;
@@ -384,18 +384,15 @@ void CFib::reign(FibTrie *insertnode,int defaultold,int newregim)
 {
 	if (insertnode==NULL)return;
 
-	//----0/0----，recursive
+	//----0/0----锛宺ecursive
 	if (insertnode->oldPort==0&&insertnode->newPort==0)
 	{
 		reign(insertnode->lchild,defaultold,newregim);
 		reign(insertnode->rchild,defaultold,newregim);
 	}
-	//----1/0----,说明该点被代表了。这个时候要不要递归,是 一个很麻烦的问题,实验证明，无需代表。。wrong。。，说明还是要递归，2009年的数据是反例
-	//这儿的递归应该还可以简化，，，，，如果是原先的执政党选民，选举成功后被代表，此时应该还原，停止。否则，就是deaf_node，无需还原，递归。实验证明，deaf_node需要还原，不知道为什么
-	//更新点的政权从default_newport，改变为inserport了。
 	else if (insertnode->oldPort!=0 && insertnode->newPort==0)
 	{
-		if (insertnode->oldPort==defaultold)//实践证明，下面的赋值语句一般都要进行，否则就错了，这里为了做最小冗余，因此
+		if (insertnode->oldPort==defaultold)
 		{
 			insertnode->newPort=insertnode->oldPort;
 		}
@@ -416,11 +413,8 @@ void CFib::reign(FibTrie *insertnode,int defaultold,int newregim)
 		reign(insertnode->lchild,defaultold,newregim);
 		reign(insertnode->rchild,defaultold,newregim);
 	}
-	//----1/1----,直接返回是最小改动，如果判断当前节点是否和insertport相同，如果相同，删掉，则是最小冗余。
 	else if (insertnode->oldPort!=0&&insertnode->newPort!=0)
 	{
-		//非常的多啊！！！9w多，处理这个太有成就感了，但老是出错，寻找原因中。。。而且新旧端口相同，而且都是叶子节点
-		//这只是处理1/1的情况，更激进的做法是还要处理0/1的情况,再激进一步是在给newport赋值的时候，看赋的值是否为newregim
 		if (insertnode->newPort==newregim)
 		{
 			insertnode->newPort=0;
@@ -432,8 +426,6 @@ void CFib::reign(FibTrie *insertnode,int defaultold,int newregim)
 void CFib::outofOffice(FibTrie *insertnode,int insertport)
 {
 	if (insertnode==NULL)return;
-
-
 
 	//----1/1 && 1/0----return
 	if (insertnode->oldPort!=0)return;
@@ -454,7 +446,7 @@ void CFib::outofOffice(FibTrie *insertnode,int insertport)
 		return;
 	}
 	
-	//0/0 ，and not leaf---recursive
+	//0/0 锛宎nd not leaf---recursive
 	else 
 	{
 		outofOffice(insertnode->lchild,insertport);
@@ -488,7 +480,6 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 				pNewNode->parent=insertNode;
 				insertNode->lchild=pNewNode;
 
-				//如果从叶子节点下面插入，则该节点为盲点。
 				if (_NOT_DELETE==operation_type)insertNode->ifblind=true;
 			}
 
@@ -510,7 +501,6 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 				pNewNode->parent=insertNode;
 				insertNode->rchild=pNewNode;
 
-				//如果从叶子节点下面插入，则该节点为盲点。
 				if (_NOT_DELETE==operation_type)insertNode->ifblind=true;
 			}
 
@@ -578,7 +568,7 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 			insertNode->oldPort=insertport;
 			insertNode->newPort=insertport;
 			//static int rund=0;
-			//printf("\r%d更改叶子...",rund++);
+			//printf("\r%d鏇存敼鍙跺瓙...",rund++);
 			return;
 		}
 
@@ -641,7 +631,6 @@ unsigned int CFib::ConvertBinToIP(string sBinFile,string sIpFile)
 	unsigned int	iNextHop;			//to store NEXTHOP in RIB file
 	unsigned int	iEntryCount=0;		//the number of items that is transformed sucessfully
 
-	//打开输出文件，准备存储IP格式路由信息
 	ofstream fout(sIpFile.c_str());
 
 	
@@ -728,7 +717,7 @@ unsigned int CFib::ConvertIpToBin(string sIpFile,string sBinFile)
 	
 		fin >> sPrefix>> iNextHop;
 
-		int iLen=strlen(sPrefix);	//定义PREFIX长度
+		int iLen=strlen(sPrefix);
 
 		if(iLen>0)
 		{
@@ -791,7 +780,7 @@ void CFib::IpToBinary(string sIP,char saBin[32]){
 		if ( sIP.substr(i,1)== "." ){
 			iEnd = i;
 			string strVal=sIP.substr(iStart,iEnd-iStart);
-			lPrefix += atol(strVal.c_str()) << (8 * iFieldIndex); //向左移位到高位
+			lPrefix += atol(strVal.c_str()) << (8 * iFieldIndex);
 			iFieldIndex--;
 			iStart = i+1;
 			i++;
@@ -911,7 +900,7 @@ unsigned int CFib::BuildFibFromFile(string sFileName)
 				if ( sPrefix[i] == '.' ){
 					iEnd = i;
 					string strVal(sPrefix+iStart,iEnd-iStart);
-					lPrefix += atol(strVal.c_str()) << (8 * iFieldIndex); //向左移位到高位
+					lPrefix += atol(strVal.c_str()) << (8 * iFieldIndex);
 					iFieldIndex--;
 					iStart = i+1;
 					i++;
