@@ -364,7 +364,7 @@ unsigned int CFib::GetAncestorHop(FibTrie* pTrie)
 void CFib::subTrieUpdate(FibTrie* root, unsigned int default_port, int operation) {
 	int level = root->nodeLevel;
 
-	if((level == TABLE1 || level == TABLE2 || level == TABLE3) && IsLeaf(root)) {	//叶子节点，统计CBF操作情况
+	if((level == TABLE1 || level == TABLE2 || level == TABLE3) && IsLeaf(root)) {
 		if (operation == _INSERT) {
 			CBFInsertNum ++;
 		}
@@ -381,14 +381,14 @@ void CFib::subTrieUpdate(FibTrie* root, unsigned int default_port, int operation
 
 	root->newPort = 0;
 
-	if (root->lchild != NULL && root->lchild->oldPort == 0) {	//递归更新左子树；若左子树的oldport为0，则更新；否则，TODO nothing
-		root->lchild->newPort = default_port;		//更改树中端口信息
+	if (root->lchild != NULL && root->lchild->oldPort == 0) {
+		root->lchild->newPort = default_port;
 		subTrieUpdate(root->lchild, default_port, operation);
 	}
 
-	if (root->rchild != NULL &&  root->rchild->oldPort == 0) {	//递归更新右子树；若右子树的oldport为0，则更新；否则，TODO nothing
-		root->rchild->newPort = default_port;		//更改树中端口信息
-		subTrieUpdate(root->rchild, default_port, operation); //递归更新
+	if (root->rchild != NULL &&  root->rchild->oldPort == 0) {
+		root->rchild->newPort = default_port;
+		subTrieUpdate(root->rchild, default_port, operation);
 	}
 }
 
@@ -399,7 +399,7 @@ void CFib::subTrieLevelPushing(FibTrie* pTrie, unsigned int default_port) {
 
 	level = pTrie->nodeLevel;
 
-	if((level == TABLE1 || level == TABLE2 || level == TABLE3) && IsLeaf(pTrie)) {	//插入仅有的操作
+	if((level == TABLE1 || level == TABLE2 || level == TABLE3) && IsLeaf(pTrie)) {
 		CBFInsertNum ++;
 		return;
 	}
@@ -469,11 +469,10 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 	if (insertport > PORT_MAX)
 		return;
 
-	int operation = -9;  //具体指插入、删除还是更改，三种状态。
+	int operation = -9; 
 		
 	FibTrie *insertNode= m_pTrie;
 
-	//定义16层和24层两个节点指针，如果定位更新节点时候，创建了新节点，则保存改节点。
 	FibTrie *levelNode16 = NULL;
 	FibTrie *levelNode24 = NULL;
 
@@ -481,13 +480,13 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 
 	int prefixLen = strlen(insert_C);
 
-	if (prefixLen < 8) {	//小于8的更新不理会
+	if (prefixLen < 8) {
 		return;
 	}
 
 	bool IfNewBornNode = false;
 	//look up the location of the current node
-	for (int i=0;i< prefixLen; i++)	//0.0.0.0/0；如果prefixLen为0，则当前节点为根节点
+	for (int i=0;i< prefixLen; i++)	//0.0.0.0/0
 	{
 		if ('0' == insert_C[i])
 		{
@@ -527,7 +526,7 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 				FibTrie* pNewNode;
 				CreateNewNode(pNewNode);
 				pNewNode->parent = insertNode;
-				pNewNode->nodeLevel = insertNode->nodeLevel + 1;		// 2014-4-18
+				pNewNode->nodeLevel = insertNode->nodeLevel + 1;
 				insertNode->rchild = pNewNode;
 			}
 
@@ -544,27 +543,27 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 		}
 	}
 	
-	if(_DELETE != operation_type)		// _NOT_DELETE，修改或插入操作
+	if(_DELETE != operation_type)		// _NOT_DELETE
 	{
-		if (0 == insertNode->oldPort) {		//插入操作
+		if (0 == insertNode->oldPort) {	
 			operation = _INSERT;
 		}
-		else if (insertNode->oldPort == insertport)		// 插入与原NextHop相同，无效操作
+		else if (insertNode->oldPort == insertport)
 		{
 			invalid++;
 			invalid1++;	// TODO nothing
 			return;
 		}
-		else {	//修改操作 
+		else {	//淇敼鎿嶄綔 
 			operation = _CHANGE;
 		}
 	}
-	else if (0 == insertNode->oldPort)	{	//Withdraw; 即Trie中不存在此前缀
+	else if (0 == insertNode->oldPort)	{	//Withdraw
 		invalid++;
 		invalid2++;	// TODO nothing
 		return;
 	}
-	else	{	//W	//删除操作
+	else	{	//W
 		operation = _DELETE;
 	}
 		
@@ -576,33 +575,33 @@ void CFib::Update(int insertport, char *insert_C, int operation_type)
 
 	if (operation == _INSERT) {
 		if (IfNewBornNode) {
-			if (levelNode16 && levelNode16->newPort != 0) {//若原来相应16层节点为叶子节点，对该节点的子树进行levelpushing操作
+			if (levelNode16 && levelNode16->newPort != 0) {
 				subTrieLevelPushing(levelNode16, levelNode16->newPort);
 			}
-			else if (levelNode24 && levelNode24->newPort != 0) {//对相应24层节点的子树进行levelpushing操作
+			else if (levelNode24 && levelNode24->newPort != 0) {
 				subTrieLevelPushing(levelNode24, levelNode24->newPort);
 			}
 		}
-		else if (IsLeaf(insertNode) && (insertNode->nodeLevel == TABLE1 || insertNode->nodeLevel == TABLE2 || insertNode->nodeLevel == TABLE3))  {//叶子节点
+		else if (IsLeaf(insertNode) && (insertNode->nodeLevel == TABLE1 || insertNode->nodeLevel == TABLE2 || insertNode->nodeLevel == TABLE3))  {//鍙跺瓙鑺傜偣
 			insertNode->oldPort = insertport;
 			insertNode->newPort = insertport;
-			CBFInsertNum++;			// 叶子节点只加1
+			CBFInsertNum++;			
 		}
-		else if (!IsLeaf(insertNode)) {		// 内部节点
+		else if (!IsLeaf(insertNode)) {		
 			insertNode->oldPort = insertport;
 			insertNode->newPort = insertport;
 			subTrieUpdate(insertNode, insertport, operation);
 		}
 	}
-	else if (operation == _CHANGE) {			//	更改操作
+	else if (operation == _CHANGE) {	
 		insertNode->oldPort = insertport;
 		insertNode->newPort = insertport;
-		subTrieUpdate(insertNode, insertport, operation);		//更新此节点的子树
+		subTrieUpdate(insertNode, insertport, operation);	
 	}
-	else if (operation == _DELETE) {			// 删除操作，则此节点的oldport设置为0，newport设置成父节点的newport
+	else if (operation == _DELETE) {	
 		insertNode->oldPort = 0;
 		insertNode->newPort = default_oldport;
-		subTrieUpdate(insertNode, default_oldport, operation);		//更新此节点的子树
+		subTrieUpdate(insertNode, default_oldport, operation);		
 	}
 
 	CBFInsertArray[CBFInsertNum]++;
@@ -992,7 +991,7 @@ int CFib::bfLookup(unsigned int IPInteger) {
 	
 	if (nexthop = level16_table[IPInteger >> (32 - TABLE1)]) {}
 	else {	
-		for (int i = 1; i <= PORT_MAX; i++) {			// 24层必查
+		for (int i = 1; i <= PORT_MAX; i++) {
 
 			if (nexthop > PORT_MAX) break;
 
