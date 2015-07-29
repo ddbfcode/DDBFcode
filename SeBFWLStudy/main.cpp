@@ -107,7 +107,7 @@ unsigned int BFLevelPushingTrieUpdate(string sFileName,CFib *tFib)
 
 	FILE * fp_u;
 	fp_u=fopen(UPDATE_TIME, "w");
-	fprintf(fp_u,"Ê±¼ä	¸üĞÂÌõÊı	Ò»·ÖÖÓ¸üĞÂÌõÊı	Ò»·ÖÖÓ²åÈëÊı	Ò»·ÖÖÓÉ¾³ıÊı		\n");
+	fprintf(fp_u,"Time	#update	#update_in_minute	#insertion_in_minute	#deletion_in_minute		\n");
 
 	for (int jjj = 1; jjj <= UpdateFileCount; jjj++)
 	{
@@ -197,7 +197,7 @@ unsigned int BFLevelPushingTrieUpdate(string sFileName,CFib *tFib)
 					{
 						iEnd = i;
 						string strVal(sPrefix + iStart, iEnd - iStart);
-						lPrefix += atol(strVal.c_str()) << (8 * iFieldIndex); //Ïò×óÒÆÎ»µ½¸ßÎ»
+						lPrefix += atol(strVal.c_str()) << (8 * iFieldIndex); //å‘å·¦ç§»ä½åˆ°é«˜ä½
 						iFieldIndex--;
 						iStart = i + 1;
 						i++;
@@ -331,7 +331,7 @@ void bfTrieDetectForFullIp(CFib *tFib) {
 		}
 	}
 
-	printf("\n\t\tTotal number of garbage roaming route£º%d",nonRouteStatic);
+	printf("\n\t\tTotal number of garbage roaming routeï¼š%d",nonRouteStatic);
 	//printf("\n\t\tTotal number of Non-Route: %d\n",nonRouteNum);
 	printf("\n\t\tEqual!!!!\n");
 	//_getch();
@@ -388,7 +388,6 @@ unsigned int * TrafficRead(char *traffic_file)
 
 void test (int argc, char** argv)
 {
-	//¶ÁÁ÷Á¿
 	if (argc<2)return;
 
 	CFib tFib = CFib();
