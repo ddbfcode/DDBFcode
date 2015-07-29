@@ -145,7 +145,6 @@ public:
 	//add a node in Rib tree
 	void AddNode(unsigned long lPrefix,unsigned int iPrefixLen,unsigned int iNextHop);
 
-	//TCAMÀ„∑®
 	bool CFib::superFree(FibTrie* pTrie);
 	void CFib::LeafPush(FibTrie* pTrie, int depth);
 	void CFib::TestLeafPush(FibTrie* pTrie, int depth);
