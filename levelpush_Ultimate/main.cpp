@@ -24,7 +24,7 @@ char * result_bat	  ="leafpush_bat.txt";
 
 #define LINESIZE	75
 using namespace std;
-bool	bIpFormat=true;								//mark of Rib file,IP format initially e.g."160.120.228/20 5356"¡£
+bool	bIpFormat=true;								//mark of Rib file,IP format initially e.g."160.120.228/20 5356"ã€‚
 
 int stop_level_console[10];
 #define DEFAULT_PORT	255
@@ -160,7 +160,6 @@ void leafpushatfile(char * ribf)
 		origi_count=tFib.solidNodeCount;
 		printf("\nThe total number of routing items in FRib file is \t%u, \nThe total number of solid Trie node is :\t%u,\ntFib.allNodeCount=%d\n",iEntryCount,tFib.solidNodeCount,tFib.allNodeCount);
 	
-		//yt 6.8ÈÕÐÞ¸Ä£¬´Ó¸ù½Úµã¿ªÊ¼push
 		if (tFib.m_pTrie->oldPort<=0)
 		{
 			tFib.m_pTrie->oldPort=DEFAULT_PORT;
@@ -174,7 +173,6 @@ void leafpushatfile(char * ribf)
 		//tFib.TestLeafPush(tFib.m_pTrie,0);
 		//printf("Test passed!\n");
 
-		//µ÷ÓÃ
 		tFib.LevelPushing(tFib.m_pTrie,0);
 		//tFib.LevelPushing(tFib.m_pTrie->rchild,1);
 

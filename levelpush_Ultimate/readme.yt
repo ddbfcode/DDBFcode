@@ -1,4 +1,0 @@
-1、支持1至10层的level push，意思是最多push到10层
-2、输出节点数统计结果至pushing_result.txt
-3、输出对应路由表至%InputFileName%.levelpush
-4、运行格式：leafpushing.exe %d %d %d %d filename
